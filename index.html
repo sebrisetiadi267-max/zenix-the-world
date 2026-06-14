@@ -1,0 +1,553 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Zenix The World</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="header-container">
+
+            <a href="#beranda" class="brand">
+
+                <div class="logo-box">
+                    <img
+                        src="./assets/logo.jpeg"
+                        alt="Logo Zenix The World"
+                        class="logo"
+                    >
+                </div>
+
+                <div class="brand-text">
+                    <h1>Zenix The World</h1>
+                    <p>Travel Fare Calculator</p>
+                </div>
+
+            </a>
+
+
+            <nav
+                class="navigation"
+                aria-label="Navigasi utama"
+            >
+
+                <a
+                    href="#beranda"
+                    class="nav-link active"
+                >
+                    Beranda
+                </a>
+
+                <a
+                    href="#kalkulator"
+                    class="nav-link"
+                >
+                    Kalkulator
+                </a>
+
+                <a
+                    href="#tentang"
+                    class="nav-link"
+                >
+                    Tentang
+                </a>
+
+            </nav>
+
+
+            <div class="status">
+                <span class="status-dot"></span>
+                <span>Sistem aktif</span>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ISI UTAMA -->
+    <main class="container">
+
+        <!-- BERANDA -->
+        <section
+            class="hero"
+            id="beranda"
+        >
+
+            <p class="label">
+                KALKULATOR TARIF PERJALANAN
+            </p>
+
+            <h2>
+                Hitung biaya perjalanan dengan mudah
+            </h2>
+
+            <p class="description">
+                Masukkan data perjalanan dan sistem akan
+                menghitung tarif secara otomatis.
+            </p>
+
+            <a
+                href="#kalkulator"
+                class="hero-button"
+            >
+                Mulai Hitung Tarif
+            </a>
+
+        </section>
+
+
+        <!-- KALKULATOR -->
+        <section
+            class="calculator-section"
+            id="kalkulator"
+        >
+
+            <div class="section-title">
+
+                <p class="label">
+                    KALKULATOR TARIF
+                </p>
+
+                <h2>
+                    Hitung tarif perjalanan
+                </h2>
+
+                <p>
+                    Masukkan data perjalanan untuk mendapatkan
+                    estimasi tarif.
+                </p>
+
+            </div>
+
+
+            <div class="calculator-layout">
+
+                <!-- FORMULIR -->
+                <form
+                    class="calculator-card"
+                    id="fareForm"
+                >
+
+                    <label class="form-group">
+
+                        <span>Jenis kendaraan</span>
+
+                        <select id="vehicle">
+
+                            <option value="reborn">
+                                Innova Reborn
+                            </option>
+
+                            <option value="zenix">
+                                Innova Zenix
+                            </option>
+
+                        </select>
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Jenis perjalanan</span>
+
+                        <select id="tripType">
+
+                            <option value="oneWay">
+                                Sekali Jalan
+                            </option>
+
+                            <option value="roundTrip">
+                                Pulang Pergi
+                            </option>
+
+                        </select>
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Nama pelanggan</span>
+
+                        <input
+                            type="text"
+                            id="customerName"
+                            placeholder="Contoh: Budi Santoso"
+                            autocomplete="name"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Nomor WhatsApp</span>
+
+                        <input
+                            type="tel"
+                            id="customerPhone"
+                            placeholder="Contoh: 081234567890"
+                            inputmode="numeric"
+                            autocomplete="tel"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Lokasi jemput</span>
+
+                        <input
+                            type="text"
+                            id="pickup"
+                            placeholder="Contoh: Kota Serang"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Tujuan perjalanan</span>
+
+                        <input
+                            type="text"
+                            id="destination"
+                            placeholder="Contoh: Bandara Soekarno-Hatta"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Tanggal penjemputan</span>
+
+                        <input
+                            type="date"
+                            id="pickupDate"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Waktu penjemputan</span>
+
+                        <input
+                            type="time"
+                            id="pickupTime"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Jarak perjalanan</span>
+
+                        <input
+                            type="number"
+                            id="distance"
+                            placeholder="Contoh: 80 KM"
+                            min="1"
+                            step="0.1"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Waktu perjalanan</span>
+
+                        <input
+                            type="number"
+                            id="duration"
+                            placeholder="Contoh: 90 menit"
+                            min="1"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Biaya tol</span>
+
+                        <input
+                            type="number"
+                            id="toll"
+                            placeholder="Contoh: 65000"
+                            min="0"
+                            value="0"
+                        >
+
+                    </label>
+
+
+                    <label class="form-group">
+
+                        <span>Biaya tambahan</span>
+
+                        <input
+                            type="number"
+                            id="additional"
+                            placeholder="Contoh: 20000"
+                            min="0"
+                            value="0"
+                        >
+
+                    </label>
+
+
+                    
+<div class="form-actions">
+
+    <button
+        type="submit"
+        class="calculate-button"
+    >
+        Hitung Tarif
+    </button>
+
+    <button
+        type="button"
+        id="resetButton"
+        class="reset-button"
+    >
+        Reset Data
+    </button>
+
+</div>
+
+
+
+                </form>
+
+
+                <!-- HASIL PERHITUNGAN -->
+                <div class="result-card">
+
+                    <p class="result-label">
+                        RUTE PERJALANAN
+                    </p>
+
+                    <h4 id="routeResult">
+                        Lokasi jemput → Tujuan
+                    </h4>
+
+
+                    <div class="result-details">
+
+                        <div>
+                            <span>Nama pelanggan</span>
+
+                            <strong id="resultCustomerName">
+                                Belum diisi
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Nomor WhatsApp</span>
+
+                            <strong id="resultCustomerPhone">
+                                Belum diisi
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Kendaraan</span>
+
+                            <strong id="resultVehicle">
+                                Belum dipilih
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Jenis perjalanan</span>
+
+                            <strong id="resultTripType">
+                                Sekali Jalan
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Tanggal penjemputan</span>
+
+                            <strong id="resultPickupDate">
+                                Belum diisi
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Waktu penjemputan</span>
+
+                            <strong id="resultPickupTime">
+                                Belum diisi
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Tarif dasar</span>
+
+                            <strong id="resultBase">
+                                Rp0
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Biaya jarak</span>
+
+                            <strong id="resultDistance">
+                                Rp0
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Biaya waktu</span>
+
+                            <strong id="resultDuration">
+                                Rp0
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Biaya tol</span>
+
+                            <strong id="resultToll">
+                                Rp0
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Biaya tambahan</span>
+
+                            <strong id="resultAdditional">
+                                Rp0
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Penyesuaian perjalanan</span>
+
+                            <strong id="resultTripAdjustment">
+                                Rp0
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span>Pembulatan tarif</span>
+
+                            <strong id="resultRounding">
+                                Rp0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- TOTAL HANYA SATU -->
+                    <div class="final-total">
+
+                        <span>Total tarif</span>
+
+                        <h3 id="finalFare">
+                            Rp0
+                        </h3>
+
+                    </div>
+
+
+                    <!-- TOMBOL WHATSAPP -->
+                    <button
+                        type="button"
+                        id="whatsappButton"
+                        class="whatsapp-button"
+                        disabled
+                    >
+                        Kirim Rincian ke WhatsApp
+                    </button>
+<button
+    type="button"
+    id="printButton"
+    class="print-button"
+    disabled
+>
+    Cetak Rincian
+</button>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TENTANG -->
+        <section
+            class="about-section"
+            id="tentang"
+        >
+
+            <p class="label">
+                TENTANG KAMI
+            </p>
+
+            <h2>
+                Zenix The World
+            </h2>
+
+            <p>
+                Zenix The World menyediakan layanan perjalanan
+                menggunakan Innova Reborn dan Innova Zenix
+                dengan tarif yang transparan serta pelayanan
+                yang profesional.
+            </p>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
+```
