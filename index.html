@@ -1,34 +1,26 @@
-<script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ================= FORM =================
+    // ================= ELEMENT FORM =================
     const fareForm = document.getElementById("fareForm");
     const vehicleInput = document.getElementById("vehicle");
     const tripTypeInput = document.getElementById("tripType");
 
     const customerNameInput = document.getElementById("customerName");
     const customerPhoneInput = document.getElementById("customerPhone");
-
     const pickupInput = document.getElementById("pickup");
     const destinationInput = document.getElementById("destination");
 
-    const pickupDateInput = document.getElementById("pickupDate");
-    const pickupTimeInput = document.getElementById("pickupTime");
-
     const distanceInput = document.getElementById("distance");
     const durationInput = document.getElementById("duration");
-
     const tollInput = document.getElementById("toll");
     const additionalInput = document.getElementById("additional");
 
-    // ================= RESULT =================
+    // ================= ELEMENT RESULT =================
     const routeResult = document.getElementById("routeResult");
     const resultCustomerName = document.getElementById("resultCustomerName");
     const resultCustomerPhone = document.getElementById("resultCustomerPhone");
     const resultVehicle = document.getElementById("resultVehicle");
     const resultTripType = document.getElementById("resultTripType");
-    const resultPickupDate = document.getElementById("resultPickupDate");
-    const resultPickupTime = document.getElementById("resultPickupTime");
 
     const resultBase = document.getElementById("resultBase");
     const resultDistance = document.getElementById("resultDistance");
@@ -39,13 +31,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const resultRounding = document.getElementById("resultRounding");
     const finalFare = document.getElementById("finalFare");
 
+    // ================= BUTTON =================
     const whatsappButton = document.getElementById("whatsappButton");
     const printButton = document.getElementById("printButton");
     const resetButton = document.getElementById("resetButton");
 
     let latestTripData = null;
 
-    // ================= VEHICLE RATE (SUDAH FIX + RUSH) =================
+    // ================= VEHICLE DATA (FIXED + RUSH) =================
     const vehicleRates = {
         reborn: {
             name: "Innova Reborn",
@@ -67,33 +60,29 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // ================= FUNCTION =================
-    function formatRupiah(num) {
-        return new Intl.NumberFormat("id-ID", {
+    // ================= FORMAT =================
+    const formatRupiah = (num) =>
+        new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
             maximumFractionDigits: 0
         }).format(num);
-    }
 
-    function roundUp(num) {
-        return Math.ceil(num / 10000) * 10000;
-    }
+    const roundUp = (num) =>
+        Math.ceil(num / 10000) * 10000;
 
-    function normalizePhone(phone) {
+    const normalizePhone = (phone) => {
         phone = phone.replace(/\D/g, "");
         if (phone.startsWith("0")) phone = "62" + phone.slice(1);
         return phone;
-    }
+    };
 
-    function resetUI() {
+    const resetUI = () => {
         routeResult.textContent = "Lokasi jemput → Tujuan";
         resultCustomerName.textContent = "Belum diisi";
         resultCustomerPhone.textContent = "Belum diisi";
         resultVehicle.textContent = "Belum dipilih";
         resultTripType.textContent = "Sekali Jalan";
-        resultPickupDate.textContent = "Belum diisi";
-        resultPickupTime.textContent = "Belum diisi";
 
         resultBase.textContent = "Rp0";
         resultDistance.textContent = "Rp0";
@@ -103,9 +92,9 @@ document.addEventListener("DOMContentLoaded", function () {
         resultTripAdjustment.textContent = "Rp0";
         resultRounding.textContent = "Rp0";
         finalFare.textContent = "Rp0";
-    }
+    };
 
-    // ================= SUBMIT =================
+    // ================= CALCULATE =================
     fareForm.addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -127,25 +116,32 @@ document.addEventListener("DOMContentLoaded", function () {
         const additional = Number(additionalInput.value) || 0;
 
         if (!name || !phone || !pickup || !destination) {
-            alert("Lengkapi data!");
+            alert("Lengkapi data terlebih dahulu");
             return;
         }
 
+        // COST
         const distanceCost = distance * vehicle.pricePerKm;
         const durationCost = duration * vehicle.pricePerMinute;
 
-        let subtotal = vehicle.baseFare + distanceCost + durationCost + toll + additional;
+        let subtotal =
+            vehicle.baseFare +
+            distanceCost +
+            durationCost +
+            toll +
+            additional;
 
         let tripAdjustment = 0;
         if (tripTypeInput.value === "roundTrip") {
             tripAdjustment = subtotal * 0.5;
         }
 
-        const total = roundUp(subtotal + tripAdjustment);
-        const rounding = total - (subtotal + tripAdjustment);
+        const totalBeforeRound = subtotal + tripAdjustment;
+        const total = roundUp(totalBeforeRound);
+        const rounding = total - totalBeforeRound;
 
-        // tampilkan hasil
-        routeResult.textContent = pickup + " → " + destination;
+        // RESULT UI
+        routeResult.textContent = `${pickup} → ${destination}`;
         resultCustomerName.textContent = name;
         resultCustomerPhone.textContent = phone;
         resultVehicle.textContent = vehicle.name;
@@ -159,18 +155,13 @@ document.addEventListener("DOMContentLoaded", function () {
         resultRounding.textContent = formatRupiah(rounding);
         finalFare.textContent = formatRupiah(total);
 
+        // SAVE DATA
         latestTripData = {
             customerName: name,
             customerPhone: phone,
             pickup,
             destination,
             vehicleName: vehicle.name,
-            distanceCost,
-            durationCost,
-            toll,
-            additional,
-            tripAdjustment,
-            roundingAdjustment: rounding,
             totalFare: total
         };
 
@@ -183,6 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fareForm.reset();
         latestTripData = null;
         resetUI();
+
         whatsappButton.disabled = true;
         printButton.disabled = true;
     });
@@ -191,12 +183,15 @@ document.addEventListener("DOMContentLoaded", function () {
     whatsappButton.addEventListener("click", function () {
         if (!latestTripData) return;
 
-        const msg =
+        const message =
 `Halo ${latestTripData.customerName}
 Total perjalanan: ${formatRupiah(latestTripData.totalFare)}`;
 
-        const url = "https://wa.me/" + normalizePhone(latestTripData.customerPhone) +
-            "?text=" + encodeURIComponent(msg);
+        const url =
+            "https://wa.me/" +
+            normalizePhone(latestTripData.customerPhone) +
+            "?text=" +
+            encodeURIComponent(message);
 
         window.open(url, "_blank");
     });
@@ -208,4 +203,3 @@ Total perjalanan: ${formatRupiah(latestTripData.totalFare)}`;
     });
 
 });
-</script>
