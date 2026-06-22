@@ -1,205 +1,1816 @@
-document.addEventListener("DOMContentLoaded", function () {
+<!DOCTYPE html>
 
-    // ================= ELEMENT FORM =================
-    const fareForm = document.getElementById("fareForm");
-    const vehicleInput = document.getElementById("vehicle");
-    const tripTypeInput = document.getElementById("tripType");
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenix The World</title>
 
-    const customerNameInput = document.getElementById("customerName");
-    const customerPhoneInput = document.getElementById("customerPhone");
-    const pickupInput = document.getElementById("pickup");
-    const destinationInput = document.getElementById("destination");
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    const distanceInput = document.getElementById("distance");
-    const durationInput = document.getElementById("duration");
-    const tollInput = document.getElementById("toll");
-    const additionalInput = document.getElementById("additional");
+html {
+    scroll-behavior: smooth;
+}
 
-    // ================= ELEMENT RESULT =================
-    const routeResult = document.getElementById("routeResult");
-    const resultCustomerName = document.getElementById("resultCustomerName");
-    const resultCustomerPhone = document.getElementById("resultCustomerPhone");
-    const resultVehicle = document.getElementById("resultVehicle");
-    const resultTripType = document.getElementById("resultTripType");
+body {
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+    color: #ffffff;
+    background: #050505;
+}
 
-    const resultBase = document.getElementById("resultBase");
-    const resultDistance = document.getElementById("resultDistance");
-    const resultDuration = document.getElementById("resultDuration");
-    const resultToll = document.getElementById("resultToll");
-    const resultAdditional = document.getElementById("resultAdditional");
-    const resultTripAdjustment = document.getElementById("resultTripAdjustment");
-    const resultRounding = document.getElementById("resultRounding");
-    const finalFare = document.getElementById("finalFare");
+a {
+    color: inherit;
+    text-decoration: none;
+}
 
-    // ================= BUTTON =================
-    const whatsappButton = document.getElementById("whatsappButton");
-    const printButton = document.getElementById("printButton");
-    const resetButton = document.getElementById("resetButton");
+button,
+input,
+select {
+    font: inherit;
+}
 
-    let latestTripData = null;
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #050505;
+    border-bottom: 1px solid rgba(212, 170, 67, 0.35);
+}
 
-    // ================= VEHICLE DATA (FIXED + RUSH) =================
-    const vehicleRates = {
-        reborn: {
-            name: "Innova Reborn",
-            baseFare: 50000,
-            pricePerKm: 6000,
-            pricePerMinute: 1300
-        },
-        zenix: {
-            name: "Innova Zenix",
-            baseFare: 65000,
-            pricePerKm: 7000,
-            pricePerMinute: 1500
-        },
-        rush: {
-            name: "Toyota Rush",
-            baseFare: 45000,
-            pricePerKm: 5500,
-            pricePerMinute: 1200
-        }
-    };
+.header-container,
+.container {
+    width: 92%;
+    max-width: 1180px;
+    margin: auto;
+}
 
-    // ================= FORMAT =================
-    const formatRupiah = (num) =>
-        new Intl.NumberFormat("id-ID", {
+.header-container {
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logo-box {
+    width: 64px;
+    height: 64px;
+    padding: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(212, 170, 67, 0.35);
+    border-radius: 18px;
+    background: #080808;
+}
+
+.logo {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.brand-text h1 {
+    color: #f0cf76;
+    font-size: 25px;
+    line-height: 1.1;
+}
+
+.brand-text p {
+    margin-top: 4px;
+    color: #a5a5a5;
+    font-size: 12px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+}
+
+.navigation {
+    display: flex;
+    gap: 22px;
+}
+
+.nav-link {
+    color: #d0d0d0;
+    font-size: 14px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #f0cf76;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    color: #b8b8b8;
+    font-size: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 999px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #54d99a;
+}
+
+.hero {
+    min-height: 560px;
+    margin-top: 90px;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(212, 170, 67, 0.35);
+    border-radius: 30px;
+    background: linear-gradient(180deg, #181713, #0b0b0b);
+}
+
+.label,
+.result-label {
+    color: #f0cf76;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.hero h2 {
+    max-width: 760px;
+    margin-top: 20px;
+    font-size: 64px;
+    line-height: 1.05;
+}
+
+.description {
+    max-width: 700px;
+    margin-top: 28px;
+    color: #c6c6c6;
+    font-size: 18px;
+}
+
+.hero-button {
+    width: 220px;
+    margin-top: 36px;
+    padding: 16px 28px;
+    color: #080808;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 14px;
+    background: #d4aa43;
+}
+
+.calculator-section {
+    padding: 110px 0 70px;
+}
+
+.section-title {
+    margin-bottom: 34px;
+}
+
+.section-title h2,
+.about-section h2 {
+    margin-top: 10px;
+    font-size: 48px;
+}
+
+.section-title p:last-child,
+.about-section p:last-child {
+    margin-top: 10px;
+    color: #a5a5a5;
+}
+
+.calculator-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+.calculator-card,
+.result-card,
+.about-section {
+    border: 1px solid rgba(212, 170, 67, 0.35);
+    border-radius: 24px;
+    background: #11110f;
+}
+
+.calculator-card {
+    padding: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group span {
+    color: #dedede;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 15px;
+    color: #ffffff;
+    background: #090909;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 13px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #d4aa43;
+}
+
+.form-group select option {
+    color: #ffffff;
+    background: #111111;
+}
+
+.form-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.calculate-button,
+.reset-button,
+.whatsapp-button,
+.print-button {
+    min-height: 54px;
+    padding: 13px 18px;
+    font-weight: 700;
+    border-radius: 14px;
+    cursor: pointer;
+}
+
+.calculate-button {
+    color: #070707;
+    background: #d4aa43;
+    border: none;
+}
+
+.reset-button,
+.print-button {
+    color: #ffffff;
+    background: #1b1b1b;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.whatsapp-button {
+    color: #06120b;
+    background: #55d98f;
+    border: none;
+}
+
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.result-card {
+    position: sticky;
+    top: 115px;
+    padding: 28px;
+}
+
+.result-card h4 {
+    margin: 10px 0 24px;
+    font-size: 23px;
+    word-break: break-word;
+}
+
+.result-details > div {
+    padding: 13px 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.result-details span {
+    color: #a5a5a5;
+    font-size: 13px;
+}
+
+.result-details strong {
+    max-width: 58%;
+    text-align: right;
+    font-size: 13px;
+    word-break: break-word;
+}
+
+.final-total {
+    margin-top: 24px;
+    padding: 22px;
+    border: 1px solid rgba(212, 170, 67, 0.35);
+    border-radius: 18px;
+    background: rgba(212, 170, 67, 0.10);
+}
+
+.final-total span {
+    color: #f0cf76;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.final-total h3 {
+    margin-top: 7px;
+    color: #f0cf76;
+    font-size: 34px;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.whatsapp-button,
+.print-button {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.about-section {
+    margin: 70px 0 100px;
+    padding: 42px;
+}
+
+@media (max-width: 900px) {
+    .navigation {
+        display: none;
+    }
+
+    .calculator-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .result-card {
+        position: static;
+    }
+}
+
+@media (max-width: 650px) {
+    .header-container,
+    .container {
+        width: 94%;
+    }
+
+    .brand-text p,
+    .status span:last-child {
+        display: none;
+    }
+
+    .hero {
+        min-height: 500px;
+        margin-top: 50px;
+        padding: 30px 22px;
+    }
+
+    .hero h2 {
+        font-size: 42px;
+    }
+
+    .calculator-card {
+        grid-template-columns: 1fr;
+        padding: 22px;
+    }
+
+    .form-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .result-card,
+    .about-section {
+        padding: 22px;
+    }
+
+    .result-details > div {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .result-details strong {
+        max-width: 100%;
+        text-align: left;
+    }
+}
+
+@media print {
+    body {
+        color: #000000;
+        background: #ffffff;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #resultCard,
+    #resultCard * {
+        visibility: visible;
+    }
+
+    #resultCard {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        color: #000000;
+        background: #ffffff;
+        border: none;
+    }
+
+    #resultCard span,
+    #resultCard strong,
+    #resultCard h3,
+    #resultCard h4,
+    #resultCard p {
+        color: #000000;
+    }
+
+    .whatsapp-button,
+    .print-button {
+        display: none;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-container">
+
+    <a href="#beranda" class="brand">
+
+        <div class="logo-box">
+            <img
+                src="assets/logo.jpeg"
+                alt="Logo Zenix The World"
+                class="logo"
+            >
+        </div>
+
+        <div class="brand-text">
+            <h1>Zenix The World</h1>
+            <p>Travel Fare Calculator</p>
+        </div>
+
+    </a>
+
+    <nav
+        class="navigation"
+        aria-label="Navigasi utama"
+    >
+        <a href="#beranda" class="nav-link active">
+            Beranda
+        </a>
+
+        <a href="#kalkulator" class="nav-link">
+            Kalkulator
+        </a>
+
+        <a href="#tentang" class="nav-link">
+            Tentang
+        </a>
+    </nav>
+
+    <div class="status">
+        <span class="status-dot"></span>
+        <span>Sistem aktif</span>
+    </div>
+
+</div>
+
+</header>
+
+<main class="container">
+
+<section class="hero" id="beranda">
+
+    <p class="label">
+        KALKULATOR TARIF PERJALANAN
+    </p>
+
+    <h2>
+        Hitung biaya perjalanan dengan mudah
+    </h2>
+
+    <p class="description">
+        Masukkan data perjalanan dan sistem akan
+        menghitung tarif secara otomatis.
+    </p>
+
+    <a
+        href="#kalkulator"
+        class="hero-button"
+    >
+        Mulai Hitung Tarif
+    </a>
+
+</section>
+
+
+<section
+    class="calculator-section"
+    id="kalkulator"
+>
+
+    <div class="section-title">
+
+        <p class="label">
+            KALKULATOR TARIF
+        </p>
+
+        <h2>
+            Hitung tarif perjalanan
+        </h2>
+
+        <p>
+            Lengkapi semua data untuk mendapatkan
+            estimasi tarif.
+        </p>
+
+    </div>
+
+
+    <div class="calculator-layout">
+
+        <form
+            class="calculator-card"
+            id="fareForm"
+        >
+
+            <label class="form-group">
+
+                <span>Jenis kendaraan</span>
+
+                <select id="vehicle" required>
+
+    <option value="reborn">
+        Innova Reborn
+    </option>
+
+    <option value="zenix">
+        Innova Zenix
+    </option>
+
+    <option value="rush">
+        Toyota Rush
+    </option>
+
+</select>
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Jenis perjalanan</span>
+
+                <select id="tripType" required>
+
+                    <option value="oneWay">
+                        Sekali Jalan
+                    </option>
+
+                    <option value="roundTrip">
+                        Pulang Pergi
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Nama pelanggan</span>
+
+                <input
+                    type="text"
+                    id="customerName"
+                    placeholder="Contoh: Budi Santoso"
+                    required
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Nomor WhatsApp</span>
+
+                <input
+                    type="tel"
+                    id="customerPhone"
+                    placeholder="Contoh: 081234567890"
+                    inputmode="numeric"
+                    required
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Lokasi jemput</span>
+
+                <input
+                    type="text"
+                    id="pickup"
+                    placeholder="Contoh: Kota Serang"
+                    required
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Tujuan perjalanan</span>
+
+                <input
+                    type="text"
+                    id="destination"
+                    placeholder="Contoh: Bandara Soekarno-Hatta"
+                    required
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Tanggal penjemputan</span>
+
+                <input
+                    type="date"
+                    id="pickupDate"
+                    required
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Waktu penjemputan</span>
+
+                <input
+                    type="time"
+                    id="pickupTime"
+                    required
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Jarak perjalanan (KM)</span>
+
+                <input
+                    type="number"
+                    id="distance"
+                    placeholder="Contoh: 80"
+                    min="0.1"
+                    step="0.1"
+                    required
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Waktu perjalanan (menit)</span>
+
+                <input
+                    type="number"
+                    id="duration"
+                    placeholder="Contoh: 90"
+                    min="1"
+                    required
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Biaya tol</span>
+
+                <input
+                    type="number"
+                    id="toll"
+                    min="0"
+                    value="0"
+                >
+
+            </label>
+
+
+            <label class="form-group">
+
+                <span>Biaya tambahan</span>
+
+                <input
+                    type="number"
+                    id="additional"
+                    min="0"
+                    value="0"
+                >
+
+            </label>
+
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="calculate-button"
+                >
+                    Hitung Tarif
+                </button>
+
+                <button
+                    type="button"
+                    id="resetButton"
+                    class="reset-button"
+                >
+                    Reset Data
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <div
+            class="result-card"
+            id="resultCard"
+        >
+
+            <p class="result-label">
+                RUTE PERJALANAN
+            </p>
+
+            <h4 id="routeResult">
+                Lokasi jemput → Tujuan
+            </h4>
+
+
+            <div class="result-details">
+
+                <div>
+                    <span>Nama pelanggan</span>
+
+                    <strong id="resultCustomerName">
+                        Belum diisi
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Nomor WhatsApp</span>
+
+                    <strong id="resultCustomerPhone">
+                        Belum diisi
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Kendaraan</span>
+
+                    <strong id="resultVehicle">
+                        Belum dipilih
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Jenis perjalanan</span>
+
+                    <strong id="resultTripType">
+                        Sekali Jalan
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Tanggal penjemputan</span>
+
+                    <strong id="resultPickupDate">
+                        Belum diisi
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Waktu penjemputan</span>
+
+                    <strong id="resultPickupTime">
+                        Belum diisi
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Tarif dasar</span>
+
+                    <strong id="resultBase">
+                        Rp0
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Biaya jarak</span>
+
+                    <strong id="resultDistance">
+                        Rp0
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Biaya waktu</span>
+
+                    <strong id="resultDuration">
+                        Rp0
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Biaya tol</span>
+
+                    <strong id="resultToll">
+                        Rp0
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Biaya tambahan</span>
+
+                    <strong id="resultAdditional">
+                        Rp0
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Penyesuaian perjalanan</span>
+
+                    <strong id="resultTripAdjustment">
+                        Rp0
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Pembulatan tarif</span>
+
+                    <strong id="resultRounding">
+                        Rp0
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="final-total">
+
+                <span>Total tarif</span>
+
+                <h3 id="finalFare">
+                    Rp0
+                </h3>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="whatsappButton"
+                class="whatsapp-button"
+                disabled
+            >
+                Kirim Rincian ke WhatsApp
+            </button>
+
+
+            <button
+                type="button"
+                id="printButton"
+                class="print-button"
+                disabled
+            >
+                Cetak Rincian
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section
+    class="about-section"
+    id="tentang"
+>
+
+    <p class="label">
+        TENTANG KAMI
+    </p>
+
+    <h2>
+        Zenix The World
+    </h2>
+
+    <p>
+        Zenix The World menyediakan layanan perjalanan
+        menggunakan Innova Reborn dan Innova Zenix
+        dengan tarif yang transparan serta pelayanan
+        profesional.
+    </p>
+
+</section>
+
+</main>
+
+<script>
+var fareForm =
+    document.getElementById("fareForm");
+
+var vehicleInput =
+    document.getElementById("vehicle");
+
+var tripTypeInput =
+    document.getElementById("tripType");
+
+var customerNameInput =
+    document.getElementById("customerName");
+
+var customerPhoneInput =
+    document.getElementById("customerPhone");
+
+var pickupInput =
+    document.getElementById("pickup");
+
+var destinationInput =
+    document.getElementById("destination");
+
+var pickupDateInput =
+    document.getElementById("pickupDate");
+
+var pickupTimeInput =
+    document.getElementById("pickupTime");
+
+var distanceInput =
+    document.getElementById("distance");
+
+var durationInput =
+    document.getElementById("duration");
+
+var tollInput =
+    document.getElementById("toll");
+
+var additionalInput =
+    document.getElementById("additional");
+
+
+var routeResult =
+    document.getElementById("routeResult");
+
+var resultCustomerName =
+    document.getElementById(
+        "resultCustomerName"
+    );
+
+var resultCustomerPhone =
+    document.getElementById(
+        "resultCustomerPhone"
+    );
+
+var resultVehicle =
+    document.getElementById(
+        "resultVehicle"
+    );
+
+var resultTripType =
+    document.getElementById(
+        "resultTripType"
+    );
+
+var resultPickupDate =
+    document.getElementById(
+        "resultPickupDate"
+    );
+
+var resultPickupTime =
+    document.getElementById(
+        "resultPickupTime"
+    );
+
+var resultBase =
+    document.getElementById(
+        "resultBase"
+    );
+
+var resultDistance =
+    document.getElementById(
+        "resultDistance"
+    );
+
+var resultDuration =
+    document.getElementById(
+        "resultDuration"
+    );
+
+var resultToll =
+    document.getElementById(
+        "resultToll"
+    );
+
+var resultAdditional =
+    document.getElementById(
+        "resultAdditional"
+    );
+
+var resultTripAdjustment =
+    document.getElementById(
+        "resultTripAdjustment"
+    );
+
+var resultRounding =
+    document.getElementById(
+        "resultRounding"
+    );
+
+var finalFare =
+    document.getElementById(
+        "finalFare"
+    );
+
+
+var whatsappButton =
+    document.getElementById(
+        "whatsappButton"
+    );
+
+var resetButton =
+    document.getElementById(
+        "resetButton"
+    );
+
+var printButton =
+    document.getElementById(
+        "printButton"
+    );
+
+var resultCard =
+    document.getElementById(
+        "resultCard"
+    );
+
+
+var latestTripData = null;
+
+
+var vehicleRates = {
+    reborn: {
+        name: "Innova Reborn",
+        baseFare: 50000,
+        pricePerKm: 6000,
+        pricePerMinute: 1300
+    },
+
+    zenix: {
+        name: "Innova Zenix",
+        baseFare: 65000,
+        pricePerKm: 7000,
+        pricePerMinute: 1500
+    },
+     rush: {
+    name: "Toyota Rush",
+    baseFare: 45000,
+    pricePerKm: 5500,
+    pricePerMinute: 1200
+}
+};
+
+
+function formatRupiah(number) {
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
             style: "currency",
             currency: "IDR",
             maximumFractionDigits: 0
-        }).format(num);
+        }
+    ).format(number);
+}
 
-    const roundUp = (num) =>
-        Math.ceil(num / 10000) * 10000;
 
-    const normalizePhone = (phone) => {
-        phone = phone.replace(/\D/g, "");
-        if (phone.startsWith("0")) phone = "62" + phone.slice(1);
-        return phone;
-    };
+function formatTanggalIndonesia(
+    value
+) {
+    var date =
+        new Date(
+            value + "T00:00:00"
+        );
 
-    const resetUI = () => {
-        routeResult.textContent = "Lokasi jemput → Tujuan";
-        resultCustomerName.textContent = "Belum diisi";
-        resultCustomerPhone.textContent = "Belum diisi";
-        resultVehicle.textContent = "Belum dipilih";
-        resultTripType.textContent = "Sekali Jalan";
+    return date.toLocaleDateString(
+        "id-ID",
+        {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
 
-        resultBase.textContent = "Rp0";
-        resultDistance.textContent = "Rp0";
-        resultDuration.textContent = "Rp0";
-        resultToll.textContent = "Rp0";
-        resultAdditional.textContent = "Rp0";
-        resultTripAdjustment.textContent = "Rp0";
-        resultRounding.textContent = "Rp0";
-        finalFare.textContent = "Rp0";
-    };
 
-    // ================= CALCULATE =================
-    fareForm.addEventListener("submit", function (e) {
-        e.preventDefault();
+function roundUpTenThousand(
+    number
+) {
+    return Math.ceil(
+        number / 10000
+    ) * 10000;
+}
 
-        const vehicle = vehicleRates[vehicleInput.value];
+
+function normalizeWhatsAppNumber(
+    phoneNumber
+) {
+    var phone =
+        phoneNumber.replace(
+            /\D/g,
+            ""
+        );
+
+    if (phone.indexOf("0") === 0) {
+        phone =
+            "62" +
+            phone.substring(1);
+    } else if (
+        phone.indexOf("8") === 0
+    ) {
+        phone =
+            "62" +
+            phone;
+    }
+
+    return phone;
+}
+
+
+function setButtonStatus(
+    disabled
+) {
+    whatsappButton.disabled =
+        disabled;
+
+    printButton.disabled =
+        disabled;
+}
+
+
+function resetResults() {
+    routeResult.textContent =
+        "Lokasi jemput → Tujuan";
+
+    resultCustomerName.textContent =
+        "Belum diisi";
+
+    resultCustomerPhone.textContent =
+        "Belum diisi";
+
+    resultVehicle.textContent =
+        "Belum dipilih";
+
+    resultTripType.textContent =
+        "Sekali Jalan";
+
+    resultPickupDate.textContent =
+        "Belum diisi";
+
+    resultPickupTime.textContent =
+        "Belum diisi";
+
+    resultBase.textContent =
+        "Rp0";
+
+    resultDistance.textContent =
+        "Rp0";
+
+    resultDuration.textContent =
+        "Rp0";
+
+    resultToll.textContent =
+        "Rp0";
+
+    resultAdditional.textContent =
+        "Rp0";
+
+    resultTripAdjustment.textContent =
+        "Rp0";
+
+    resultRounding.textContent =
+        "Rp0";
+
+    finalFare.textContent =
+        "Rp0";
+}
+
+
+function createWhatsAppMessage(
+    data
+) {
+    return [
+        "Halo " +
+            data.customerName +
+            ",",
+
+        "",
+
+        "Berikut rincian perjalanan Anda:",
+
+        "",
+
+        "Kendaraan: " +
+            data.vehicleName,
+
+        "Jenis perjalanan: " +
+            data.tripTypeName,
+
+        "Rute: " +
+            data.pickup +
+            " → " +
+            data.destination,
+
+        "Tanggal penjemputan: " +
+            data.pickupDate,
+
+        "Waktu penjemputan: " +
+            data.pickupTime +
+            " WIB",
+
+        "Jarak perjalanan: " +
+            data.distance +
+            " KM",
+
+        "Waktu perjalanan: " +
+            data.duration +
+            " menit",
+
+        "",
+
+        "Tarif dasar: " +
+            formatRupiah(
+                data.baseFare
+            ),
+
+        "Biaya jarak: " +
+            formatRupiah(
+                data.distanceCost
+            ),
+
+        "Biaya waktu: " +
+            formatRupiah(
+                data.durationCost
+            ),
+
+        "Biaya tol: " +
+            formatRupiah(
+                data.toll
+            ),
+
+        "Biaya tambahan: " +
+            formatRupiah(
+                data.additional
+            ),
+
+        "Penyesuaian perjalanan: " +
+            formatRupiah(
+                data.tripAdjustment
+            ),
+
+        "Pembulatan: " +
+            formatRupiah(
+                data.roundingAdjustment
+            ),
+
+        "",
+
+        "Total tarif: " +
+            formatRupiah(
+                data.totalFare
+            ),
+
+        "",
+
+        "Terima kasih telah menggunakan layanan Zenix The World."
+    ].join("\n");
+}
+
+
+setButtonStatus(true);
+
+
+customerPhoneInput.addEventListener(
+    "input",
+    function () {
+        this.value =
+            this.value.replace(
+                /[^0-9+]/g,
+                ""
+            );
+    }
+);
+
+
+fareForm.addEventListener(
+    "submit",
+    function (event) {
+        event.preventDefault();
+
+        var vehicle =
+            vehicleRates[
+                vehicleInput.value
+            ];
+
+        var customerName =
+            customerNameInput
+                .value
+                .trim();
+
+        var customerPhone =
+            customerPhoneInput
+                .value
+                .trim();
+
+        var pickup =
+            pickupInput
+                .value
+                .trim();
+
+        var destination =
+            destinationInput
+                .value
+                .trim();
+
+        var pickupDate =
+            pickupDateInput.value;
+
+        var pickupTime =
+            pickupTimeInput.value;
+
+        var distance =
+            Number(
+                distanceInput.value
+            );
+
+        var duration =
+            Number(
+                durationInput.value
+            );
+
+        var toll =
+            Number(
+                tollInput.value
+            ) || 0;
+
+        var additional =
+            Number(
+                additionalInput.value
+            ) || 0;
+
+        var phoneNumbersOnly =
+            customerPhone.replace(
+                /\D/g,
+                ""
+            );
+
 
         if (!vehicle) {
-            alert("Jenis kendaraan tidak valid");
+            alert(
+                "Jenis kendaraan tidak valid."
+            );
+
             return;
         }
 
-        const name = customerNameInput.value.trim();
-        const phone = customerPhoneInput.value.trim();
-        const pickup = pickupInput.value.trim();
-        const destination = destinationInput.value.trim();
 
-        const distance = Number(distanceInput.value);
-        const duration = Number(durationInput.value);
-        const toll = Number(tollInput.value) || 0;
-        const additional = Number(additionalInput.value) || 0;
+        if (customerName === "") {
+            alert(
+                "Nama pelanggan harus diisi."
+            );
 
-        if (!name || !phone || !pickup || !destination) {
-            alert("Lengkapi data terlebih dahulu");
+            customerNameInput.focus();
+
             return;
         }
 
-        // COST
-        const distanceCost = distance * vehicle.pricePerKm;
-        const durationCost = duration * vehicle.pricePerMinute;
 
-        let subtotal =
+        if (
+            phoneNumbersOnly.length < 10 ||
+            phoneNumbersOnly.length > 15
+        ) {
+            alert(
+                "Nomor WhatsApp harus berisi 10 sampai 15 angka."
+            );
+
+            customerPhoneInput.focus();
+
+            return;
+        }
+
+
+        if (pickup === "") {
+            alert(
+                "Lokasi jemput harus diisi."
+            );
+
+            pickupInput.focus();
+
+            return;
+        }
+
+
+        if (destination === "") {
+            alert(
+                "Tujuan perjalanan harus diisi."
+            );
+
+            destinationInput.focus();
+
+            return;
+        }
+
+
+        if (pickupDate === "") {
+            alert(
+                "Tanggal penjemputan harus diisi."
+            );
+
+            pickupDateInput.focus();
+
+            return;
+        }
+
+
+        if (pickupTime === "") {
+            alert(
+                "Waktu penjemputan harus diisi."
+            );
+
+            pickupTimeInput.focus();
+
+            return;
+        }
+
+
+        if (
+            !Number.isFinite(distance) ||
+            distance <= 0
+        ) {
+            alert(
+                "Jarak perjalanan harus lebih dari 0 KM."
+            );
+
+            distanceInput.focus();
+
+            return;
+        }
+
+
+        if (
+            !Number.isFinite(duration) ||
+            duration <= 0
+        ) {
+            alert(
+                "Waktu perjalanan harus lebih dari 0 menit."
+            );
+
+            durationInput.focus();
+
+            return;
+        }
+
+
+        if (
+            toll < 0 ||
+            additional < 0
+        ) {
+            alert(
+                "Biaya tidak boleh kurang dari 0."
+            );
+
+            return;
+        }
+
+
+        var distanceCost =
+            distance *
+            vehicle.pricePerKm;
+
+        var durationCost =
+            duration *
+            vehicle.pricePerMinute;
+
+        var subtotal =
             vehicle.baseFare +
             distanceCost +
             durationCost +
             toll +
             additional;
 
-        let tripAdjustment = 0;
-        if (tripTypeInput.value === "roundTrip") {
-            tripAdjustment = subtotal * 0.5;
+
+        var tripTypeName =
+            "Sekali Jalan";
+
+        var tripAdjustment =
+            0;
+
+
+        if (
+            tripTypeInput.value ===
+            "roundTrip"
+        ) {
+            tripTypeName =
+                "Pulang Pergi";
+
+            tripAdjustment =
+                subtotal * 0.5;
         }
 
-        const totalBeforeRound = subtotal + tripAdjustment;
-        const total = roundUp(totalBeforeRound);
-        const rounding = total - totalBeforeRound;
 
-        // RESULT UI
-        routeResult.textContent = `${pickup} → ${destination}`;
-        resultCustomerName.textContent = name;
-        resultCustomerPhone.textContent = phone;
-        resultVehicle.textContent = vehicle.name;
+        var totalBeforeRounding =
+            subtotal +
+            tripAdjustment;
 
-        resultBase.textContent = formatRupiah(vehicle.baseFare);
-        resultDistance.textContent = formatRupiah(distanceCost);
-        resultDuration.textContent = formatRupiah(durationCost);
-        resultToll.textContent = formatRupiah(toll);
-        resultAdditional.textContent = formatRupiah(additional);
-        resultTripAdjustment.textContent = formatRupiah(tripAdjustment);
-        resultRounding.textContent = formatRupiah(rounding);
-        finalFare.textContent = formatRupiah(total);
+        var totalFare =
+            roundUpTenThousand(
+                totalBeforeRounding
+            );
 
-        // SAVE DATA
+        var roundingAdjustment =
+            totalFare -
+            totalBeforeRounding;
+
+        var formattedPickupDate =
+            formatTanggalIndonesia(
+                pickupDate
+            );
+
+
+        routeResult.textContent =
+            pickup +
+            " → " +
+            destination;
+
+        resultCustomerName.textContent =
+            customerName;
+
+        resultCustomerPhone.textContent =
+            customerPhone;
+
+        resultVehicle.textContent =
+            vehicle.name;
+
+        resultTripType.textContent =
+            tripTypeName;
+
+        resultPickupDate.textContent =
+            formattedPickupDate;
+
+        resultPickupTime.textContent =
+            pickupTime +
+            " WIB";
+
+        resultBase.textContent =
+            formatRupiah(
+                vehicle.baseFare
+            );
+
+        resultDistance.textContent =
+            formatRupiah(
+                distanceCost
+            );
+
+        resultDuration.textContent =
+            formatRupiah(
+                durationCost
+            );
+
+        resultToll.textContent =
+            formatRupiah(
+                toll
+            );
+
+        resultAdditional.textContent =
+            formatRupiah(
+                additional
+            );
+
+        resultTripAdjustment.textContent =
+            formatRupiah(
+                tripAdjustment
+            );
+
+        resultRounding.textContent =
+            formatRupiah(
+                roundingAdjustment
+            );
+
+        finalFare.textContent =
+            formatRupiah(
+                totalFare
+            );
+
+
         latestTripData = {
-            customerName: name,
-            customerPhone: phone,
-            pickup,
-            destination,
-            vehicleName: vehicle.name,
-            totalFare: total
+            customerName:
+                customerName,
+
+            customerPhone:
+                customerPhone,
+
+            pickup:
+                pickup,
+
+            destination:
+                destination,
+
+            vehicleName:
+                vehicle.name,
+
+            tripTypeName:
+                tripTypeName,
+
+            pickupDate:
+                formattedPickupDate,
+
+            pickupTime:
+                pickupTime,
+
+            distance:
+                distance,
+
+            duration:
+                duration,
+
+            baseFare:
+                vehicle.baseFare,
+
+            distanceCost:
+                distanceCost,
+
+            durationCost:
+                durationCost,
+
+            toll:
+                toll,
+
+            additional:
+                additional,
+
+            tripAdjustment:
+                tripAdjustment,
+
+            roundingAdjustment:
+                roundingAdjustment,
+
+            totalFare:
+                totalFare
         };
 
-        whatsappButton.disabled = false;
-        printButton.disabled = false;
-    });
 
-    // ================= RESET =================
-    resetButton.addEventListener("click", function () {
+        setButtonStatus(false);
+
+
+        resultCard.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+);
+
+
+resetButton.addEventListener(
+    "click",
+    function () {
         fareForm.reset();
+
         latestTripData = null;
-        resetUI();
 
-        whatsappButton.disabled = true;
-        printButton.disabled = true;
-    });
+        resetResults();
 
-    // ================= WHATSAPP =================
-    whatsappButton.addEventListener("click", function () {
-        if (!latestTripData) return;
+        tollInput.value =
+            "0";
 
-        const message =
-`Halo ${latestTripData.customerName}
-Total perjalanan: ${formatRupiah(latestTripData.totalFare)}`;
+        additionalInput.value =
+            "0";
 
-        const url =
+        setButtonStatus(true);
+
+        customerNameInput.focus();
+    }
+);
+
+
+whatsappButton.addEventListener(
+    "click",
+    function () {
+        if (
+            latestTripData === null
+        ) {
+            alert(
+                "Hitung tarif terlebih dahulu."
+            );
+
+            return;
+        }
+
+
+        var phoneNumber =
+            normalizeWhatsAppNumber(
+                latestTripData
+                    .customerPhone
+            );
+
+        var message =
+            createWhatsAppMessage(
+                latestTripData
+            );
+
+        var whatsappUrl =
             "https://wa.me/" +
-            normalizePhone(latestTripData.customerPhone) +
+            phoneNumber +
             "?text=" +
-            encodeURIComponent(message);
+            encodeURIComponent(
+                message
+            );
 
-        window.open(url, "_blank");
-    });
 
-    // ================= PRINT =================
-    printButton.addEventListener("click", function () {
-        if (!latestTripData) return;
+        window.open(
+            whatsappUrl,
+            "_blank"
+        );
+    }
+);
+
+
+printButton.addEventListener(
+    "click",
+    function () {
+        if (
+            latestTripData === null
+        ) {
+            alert(
+                "Hitung tarif terlebih dahulu."
+            );
+
+            return;
+        }
+
         window.print();
-    });
+    }
+);
+</script>
 
-});
+</body>
+</html>
