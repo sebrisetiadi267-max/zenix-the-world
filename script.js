@@ -1,205 +1,184 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ================= ELEMENT FORM =================
-    const fareForm = document.getElementById("fareForm");
-    const vehicleInput = document.getElementById("vehicle");
-    const tripTypeInput = document.getElementById("tripType");
+const fareForm = document.getElementById("fareForm");
+const vehicleInput = document.getElementById("vehicle");
+const tripTypeInput = document.getElementById("tripType");
+const customerNameInput = document.getElementById("customerName");
+const customerPhoneInput = document.getElementById("customerPhone");
+const pickupInput = document.getElementById("pickup");
+const destinationInput = document.getElementById("destination");
+const pickupDateInput = document.getElementById("pickupDate");
+const pickupTimeInput = document.getElementById("pickupTime");
+const distanceInput = document.getElementById("distance");
+const durationInput = document.getElementById("duration");
+const tollInput = document.getElementById("toll");
+const additionalInput = document.getElementById("additional");
 
-    const customerNameInput = document.getElementById("customerName");
-    const customerPhoneInput = document.getElementById("customerPhone");
-    const pickupInput = document.getElementById("pickup");
-    const destinationInput = document.getElementById("destination");
+const routeResult = document.getElementById("routeResult");
+const resultCustomerName = document.getElementById("resultCustomerName");
+const resultCustomerPhone = document.getElementById("resultCustomerPhone");
+const resultVehicle = document.getElementById("resultVehicle");
+const resultTripType = document.getElementById("resultTripType");
+const resultPickupDate = document.getElementById("resultPickupDate");
+const resultPickupTime = document.getElementById("resultPickupTime");
+const resultBase = document.getElementById("resultBase");
+const resultDistance = document.getElementById("resultDistance");
+const resultDuration = document.getElementById("resultDuration");
+const resultToll = document.getElementById("resultToll");
+const resultAdditional = document.getElementById("resultAdditional");
+const resultTripAdjustment = document.getElementById("resultTripAdjustment");
+const resultRounding = document.getElementById("resultRounding");
+const finalFare = document.getElementById("finalFare");
 
-    const distanceInput = document.getElementById("distance");
-    const durationInput = document.getElementById("duration");
-    const tollInput = document.getElementById("toll");
-    const additionalInput = document.getElementById("additional");
+const whatsappButton = document.getElementById("whatsappButton");
+const printButton = document.getElementById("printButton");
+const resetButton = document.getElementById("resetButton");
 
-    // ================= ELEMENT RESULT =================
-    const routeResult = document.getElementById("routeResult");
-    const resultCustomerName = document.getElementById("resultCustomerName");
-    const resultCustomerPhone = document.getElementById("resultCustomerPhone");
-    const resultVehicle = document.getElementById("resultVehicle");
-    const resultTripType = document.getElementById("resultTripType");
+let latestTripData = null;
 
-    const resultBase = document.getElementById("resultBase");
-    const resultDistance = document.getElementById("resultDistance");
-    const resultDuration = document.getElementById("resultDuration");
-    const resultToll = document.getElementById("resultToll");
-    const resultAdditional = document.getElementById("resultAdditional");
-    const resultTripAdjustment = document.getElementById("resultTripAdjustment");
-    const resultRounding = document.getElementById("resultRounding");
-    const finalFare = document.getElementById("finalFare");
+/* =========================
+   VEHICLE DATA (FIX RUSH OK)
+========================= */
+const vehicleRates = {
+    reborn: {
+        name: "Innova Reborn",
+        baseFare: 50000,
+        pricePerKm: 6000,
+        pricePerMinute: 1300
+    },
+    zenix: {
+        name: "Innova Zenix",
+        baseFare: 65000,
+        pricePerKm: 7000,
+        pricePerMinute: 1500
+    },
+    rush: {
+        name: "Toyota Rush",
+        baseFare: 45000,
+        pricePerKm: 5500,
+        pricePerMinute: 1200
+    }
+};
 
-    // ================= BUTTON =================
-    const whatsappButton = document.getElementById("whatsappButton");
-    const printButton = document.getElementById("printButton");
-    const resetButton = document.getElementById("resetButton");
+/* =========================
+   UTIL
+========================= */
+const formatRupiah = (num) =>
+    new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+    }).format(num);
 
-    let latestTripData = null;
+const roundUp10k = (n) => Math.ceil(n / 10000) * 10000;
 
-    // ================= VEHICLE DATA (FIXED + RUSH) =================
-    const vehicleRates = {
-        reborn: {
-            name: "Innova Reborn",
-            baseFare: 50000,
-            pricePerKm: 6000,
-            pricePerMinute: 1300
-        },
-        zenix: {
-            name: "Innova Zenix",
-            baseFare: 65000,
-            pricePerKm: 7000,
-            pricePerMinute: 1500
-        },
-        rush: {
-            name: "Toyota Rush",
-            baseFare: 45000,
-            pricePerKm: 5500,
-            pricePerMinute: 1200
-        }
-    };
+/* =========================
+   RESET UI
+========================= */
+function resetUI() {
+    routeResult.textContent = "Lokasi jemput → Tujuan";
+    resultCustomerName.textContent = "Belum diisi";
+    resultCustomerPhone.textContent = "Belum diisi";
+    resultVehicle.textContent = "Belum dipilih";
+    resultTripType.textContent = "Sekali Jalan";
+    resultPickupDate.textContent = "Belum diisi";
+    resultPickupTime.textContent = "Belum diisi";
+    resultBase.textContent = "Rp0";
+    resultDistance.textContent = "Rp0";
+    resultDuration.textContent = "Rp0";
+    resultToll.textContent = "Rp0";
+    resultAdditional.textContent = "Rp0";
+    resultTripAdjustment.textContent = "Rp0";
+    resultRounding.textContent = "Rp0";
+    finalFare.textContent = "Rp0";
+}
 
-    // ================= FORMAT =================
-    const formatRupiah = (num) =>
-        new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            maximumFractionDigits: 0
-        }).format(num);
+/* =========================
+   SUBMIT
+========================= */
+fareForm.addEventListener("submit", function (e) {
+    e.preventDefault();
 
-    const roundUp = (num) =>
-        Math.ceil(num / 10000) * 10000;
+    const vehicleKey = vehicleInput.value;
 
-    const normalizePhone = (phone) => {
-        phone = phone.replace(/\D/g, "");
-        if (phone.startsWith("0")) phone = "62" + phone.slice(1);
-        return phone;
-    };
+    // FIX ERROR VALIDASI RUSH
+    const vehicle = vehicleRates[vehicleKey];
 
-    const resetUI = () => {
-        routeResult.textContent = "Lokasi jemput → Tujuan";
-        resultCustomerName.textContent = "Belum diisi";
-        resultCustomerPhone.textContent = "Belum diisi";
-        resultVehicle.textContent = "Belum dipilih";
-        resultTripType.textContent = "Sekali Jalan";
+    if (!vehicle) {
+        alert("Jenis kendaraan tidak valid: " + vehicleKey);
+        return;
+    }
 
-        resultBase.textContent = "Rp0";
-        resultDistance.textContent = "Rp0";
-        resultDuration.textContent = "Rp0";
-        resultToll.textContent = "Rp0";
-        resultAdditional.textContent = "Rp0";
-        resultTripAdjustment.textContent = "Rp0";
-        resultRounding.textContent = "Rp0";
-        finalFare.textContent = "Rp0";
-    };
+    const name = customerNameInput.value.trim();
+    const phone = customerPhoneInput.value.trim();
+    const pickup = pickupInput.value.trim();
+    const destination = destinationInput.value.trim();
 
-    // ================= CALCULATE =================
-    fareForm.addEventListener("submit", function (e) {
-        e.preventDefault();
+    const distance = Number(distanceInput.value);
+    const duration = Number(durationInput.value);
+    const toll = Number(tollInput.value || 0);
+    const additional = Number(additionalInput.value || 0);
 
-        const vehicle = vehicleRates[vehicleInput.value];
+    if (!name || !phone || !pickup || !destination) {
+        alert("Semua data wajib diisi");
+        return;
+    }
 
-        if (!vehicle) {
-            alert("Jenis kendaraan tidak valid");
-            return;
-        }
+    const distanceCost = distance * vehicle.pricePerKm;
+    const durationCost = duration * vehicle.pricePerMinute;
 
-        const name = customerNameInput.value.trim();
-        const phone = customerPhoneInput.value.trim();
-        const pickup = pickupInput.value.trim();
-        const destination = destinationInput.value.trim();
+    const subtotal =
+        vehicle.baseFare +
+        distanceCost +
+        durationCost +
+        toll +
+        additional;
 
-        const distance = Number(distanceInput.value);
-        const duration = Number(durationInput.value);
-        const toll = Number(tollInput.value) || 0;
-        const additional = Number(additionalInput.value) || 0;
+    let tripAdjustment = 0;
+    let tripTypeName = tripTypeInput.value;
 
-        if (!name || !phone || !pickup || !destination) {
-            alert("Lengkapi data terlebih dahulu");
-            return;
-        }
+    if (tripTypeInput.value === "roundTrip") {
+        tripTypeName = "Pulang Pergi";
+        tripAdjustment = subtotal * 0.5;
+    } else {
+        tripTypeName = "Sekali Jalan";
+    }
 
-        // COST
-        const distanceCost = distance * vehicle.pricePerKm;
-        const durationCost = duration * vehicle.pricePerMinute;
+    const total = roundUp10k(subtotal + tripAdjustment);
 
-        let subtotal =
-            vehicle.baseFare +
-            distanceCost +
-            durationCost +
-            toll +
-            additional;
+    // OUTPUT
+    resultCustomerName.textContent = name;
+    resultCustomerPhone.textContent = phone;
+    resultVehicle.textContent = vehicle.name;
+    resultTripType.textContent = tripTypeName;
 
-        let tripAdjustment = 0;
-        if (tripTypeInput.value === "roundTrip") {
-            tripAdjustment = subtotal * 0.5;
-        }
+    resultDistance.textContent = formatRupiah(distanceCost);
+    resultDuration.textContent = formatRupiah(durationCost);
+    resultToll.textContent = formatRupiah(toll);
+    resultAdditional.textContent = formatRupiah(additional);
+    resultTripAdjustment.textContent = formatRupiah(tripAdjustment);
+    resultRounding.textContent = formatRupiah(total);
 
-        const totalBeforeRound = subtotal + tripAdjustment;
-        const total = roundUp(totalBeforeRound);
-        const rounding = total - totalBeforeRound;
+    finalFare.textContent = formatRupiah(total);
 
-        // RESULT UI
-        routeResult.textContent = `${pickup} → ${destination}`;
-        resultCustomerName.textContent = name;
-        resultCustomerPhone.textContent = phone;
-        resultVehicle.textContent = vehicle.name;
+    latestTripData = { name, phone, vehicle: vehicle.name, total };
+});
 
-        resultBase.textContent = formatRupiah(vehicle.baseFare);
-        resultDistance.textContent = formatRupiah(distanceCost);
-        resultDuration.textContent = formatRupiah(durationCost);
-        resultToll.textContent = formatRupiah(toll);
-        resultAdditional.textContent = formatRupiah(additional);
-        resultTripAdjustment.textContent = formatRupiah(tripAdjustment);
-        resultRounding.textContent = formatRupiah(rounding);
-        finalFare.textContent = formatRupiah(total);
+/* =========================
+   RESET
+========================= */
+resetButton.addEventListener("click", function () {
+    fareForm.reset();
+    latestTripData = null;
+    resetUI();
+});
 
-        // SAVE DATA
-        latestTripData = {
-            customerName: name,
-            customerPhone: phone,
-            pickup,
-            destination,
-            vehicleName: vehicle.name,
-            totalFare: total
-        };
-
-        whatsappButton.disabled = false;
-        printButton.disabled = false;
-    });
-
-    // ================= RESET =================
-    resetButton.addEventListener("click", function () {
-        fareForm.reset();
-        latestTripData = null;
-        resetUI();
-
-        whatsappButton.disabled = true;
-        printButton.disabled = true;
-    });
-
-    // ================= WHATSAPP =================
-    whatsappButton.addEventListener("click", function () {
-        if (!latestTripData) return;
-
-        const message =
-`Halo ${latestTripData.customerName}
-Total perjalanan: ${formatRupiah(latestTripData.totalFare)}`;
-
-        const url =
-            "https://wa.me/" +
-            normalizePhone(latestTripData.customerPhone) +
-            "?text=" +
-            encodeURIComponent(message);
-
-        window.open(url, "_blank");
-    });
-
-    // ================= PRINT =================
-    printButton.addEventListener("click", function () {
-        if (!latestTripData) return;
-        window.print();
-    });
+/* =========================
+   PRINT
+========================= */
+printButton.addEventListener("click", function () {
+    if (!latestTripData) return alert("Hitung dulu!");
+    window.print();
+});
 
 });
