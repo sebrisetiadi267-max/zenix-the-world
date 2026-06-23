@@ -1104,3 +1104,77 @@ button:active {
         color: #000000;
     }
 }
+.print-button {
+    width: 100%;
+    min-height: 52px;
+    margin-top: 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.print-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+@media print {
+    body {
+        background: #ffffff;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    .result-card,
+    .result-card * {
+        visibility: visible;
+    }
+
+    .result-card {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        max-width: none;
+
+        padding: 30px;
+
+        color: #000000;
+        background: #ffffff;
+
+        border: none;
+        box-shadow: none;
+    }
+
+    .result-card span,
+    .result-card strong,
+    .result-card h4 {
+        color: #000000;
+    }
+
+    .final-total {
+        background: #eeeeee;
+        border: 1px solid #cccccc;
+    }
+
+    .final-total span,
+    .final-total h3 {
+        color: #000000;
+    }
+
+    .whatsapp-button,
+    .print-button {
+        display: none;
+    }
+}
